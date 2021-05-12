@@ -10,11 +10,18 @@ namespace SeleniumToolkit.TableElements
         /// <summary>
         /// Web element of the cell
         /// </summary>
-        public IWebElement Element { get; set; }
+        public readonly IWebElement Element;
         /// <summary>
         /// Text of the web element
         /// </summary>
-        public string Text { get; set; }
+        public readonly string Text;
+
+        public Cell(IWebElement element, string text)
+        {
+            Element = element;
+            Text = text;
+        }
+
         public override string ToString()
         {
             return $"{Text}";

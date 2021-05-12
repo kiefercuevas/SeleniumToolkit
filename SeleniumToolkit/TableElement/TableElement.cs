@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading;
 
 namespace SeleniumToolkit.TableElements
 {
@@ -26,22 +27,33 @@ namespace SeleniumToolkit.TableElements
             get { return _dictTable.Count; }
         }
 
-        /// <summary>
-        /// Loads all the information from IWebElement table
-        /// </summary>
-        public void Load(IWebElement table)
+        public TableElement()
         {
-            ValidateTable(table);
-            SetParams();
-            SetHeadersFromWebTable(table);
-            SetBodyFromWebTable(table, 0, -1);
+
         }
 
         /// <summary>
         /// Loads all the information from IWebElement table
         /// </summary>
+        /// <param name="table">A IWebElement that represents a table</param>
+        /// <param name="token">A cancelation token to cancel the operation</param>
+        public void Load(IWebElement table, CancellationToken? token = null)
+        {
+            ValidateTable(table);
+            SetParams();
+
+            TableOptions options = new TableOptions();
+            SetHeadersFromWebTable(table, token, options);
+            SetBodyFromWebTable(table, token, options);
+        }
+
+        /// <summary>
+        /// Loads all the information from IWebElement table
+        /// </summary>
+        /// <param name="table">A IWebElement that represents a table</param>
         /// <param name="options">provide some options into the Table element</param>
-        public void Load(IWebElement table, TableOptions options)
+        /// <param name="token">A cancelation token to cancel the operation</param>
+        public void Load(IWebElement table, TableOptions options, CancellationToken? token = null)
         {
             ValidateTable(table);
 
@@ -49,100 +61,36 @@ namespace SeleniumToolkit.TableElements
                 throw new ArgumentNullException(nameof(options));
 
             SetParams();
-            SetHeadersFromWebTable(table);
-
-            if (options.GetEmptyTable == false)
-                SetBodyFromWebTable(table, options.StartRow, options.RowAmount);
+            SetHeadersFromWebTable(table, token, options);
+            SetBodyFromWebTable(table, token, options);
         }
 
-        public TableElement()
-        {
-            
-        }
-
-        private void ValidateTable(IWebElement table)
-        {
-            if (table.TagName.ToLower() != _tagName)
-                throw new Exception(string.Format("The {0} is not a table", table.TagName));
-        }
-
-        public void AddTable(IWebElement table)
+        /// <summary>
+        /// Append a new table body to the current table
+        /// </summary>
+        /// <param name="table">The new table to add</param>
+        /// <param name="token">A cancelation token to cancel the operation</param>
+        public void AddTableBody(IWebElement table, CancellationToken? token)
         {
             if (table.TagName.ToLower() != _tagName)
                 throw new Exception(string.Format("The {0} is not a table", table.TagName));
 
-            SetBodyFromWebTable(table);
+            SetBodyFromWebTable(table, token, new TableOptions());
         }
 
-        public void AddTable(IWebElement table, int startRow, int amountOfRows)
+        /// <summary>
+        ///  Append a new table body to the current table
+        /// </summary>
+        /// <param name="table">The new table to add</param>
+        /// <param name="options">provide some options into the Table element</param>
+        /// <param name="token">A cancelation token to cancel the operation</param>
+        public void AddTableBody(IWebElement table, TableOptions options, CancellationToken? token)
         {
             if (table.TagName.ToLower() != _tagName)
                 throw new Exception(string.Format("The {0} is not a table", table.TagName));
 
-            SetBodyFromWebTable(table, startRow, amountOfRows);
+            SetBodyFromWebTable(table, token, options);
         }
-
-        private void SetHeadersFromWebTable(IWebElement table)
-        {
-            string trXpression = new XpathExpression("tr", _anyWhereInChild).WherePosition(1).GetExpression();
-            IWebElement header = table.FindElement(By.XPath(trXpression));
-            IList<IWebElement> tds = header.FindElements(By.XPath(tdOrTh));
-
-            Headers = new List<Cell>();
-            for (int i = 0; i < tds.Count; i++)
-            {
-                Cell existHeader = Headers.FirstOrDefault(c => c.Text.Contains(tds[i].Text));
-                Cell cell = null;
-
-                if (existHeader != null)
-                    cell = GetTd(tds[i], isFromHeader: true, additionalText: i.ToString());
-                else
-                    cell = GetTd(tds[i], isFromHeader: true);
-
-                Headers.Add(cell);
-            }
-        }
-        private void SetBodyFromWebTable(IWebElement table, int startRow = 0, int amountOfRows = -1)
-        {
-            ICollection<IWebElement> trs = table.FindElements(By.XPath(trExpression1.GetExpression()));
-            if (trs.Count == 0)
-                trs = table.FindElements(By.XPath(trEXpression2.GetExpression()));
-
-            startRow = startRow > 0 ? startRow : 0;
-            amountOfRows = amountOfRows > 0 ? amountOfRows : trs.Count;
-
-
-            //For each row in the table
-            foreach (IWebElement row in trs.Skip(startRow))
-            {
-                int headerIndex = 0;
-                IList<IWebElement> cells = row.FindElements(By.XPath(tdOrTh));
-                if (cells.Count != Headers.Count)
-                    continue;
-
-                Dictionary<string, Cell> currentRow = new Dictionary<string, Cell>();
-
-                foreach (IWebElement cell in cells)
-                {
-                    currentRow.Add(Headers[headerIndex].Text, GetTd(cell));
-                    headerIndex++;
-                }
-
-                OnRowCreated(currentRow);
-
-                _dictTable.Add(currentRow);
-                if (_dictTable.Count == amountOfRows)
-                    break;
-            }
-        }
-        private void SetParams()
-        {
-            _dictTable = new List<IDictionary<string, Cell>>();
-            trExpression1 = new XpathExpression("tr", _anyWhereInChild).WherePositionGreaterThan(1).WhereAncestor(new XpathExpression("table", _anyWhereInChild).WhereNotDescendant("thead"));
-            trEXpression2 = new XpathExpression("tr", _anyWhereInChild).WherePositionGreaterOrEqualThan(1).WhereNotParent("thead");
-            tdOrTh = new XpathExpression("th", _directChild).Union(new XpathExpression("td", _directChild));
-        }
-
 
         /// <summary>
         /// Ge the column with the specified name
@@ -344,25 +292,22 @@ namespace SeleniumToolkit.TableElements
         {
             if (string.IsNullOrWhiteSpace(element.Text) && isFromHeader)
             {
-                return new Cell
-                {
-                    Element = element,
-                    Text = string.Format("DefaultHeader{0}", DefaultTextIndex++),
-                };
+                return new Cell(element, string.Format("DefaultHeader{0}", DefaultTextIndex++));
             }
-            return new Cell
-            {
-                Text = element.Text + additionalText,
-                Element = element,
-            };
+
+            return new Cell(element, element.Text + additionalText);
         }
 
+        private void ValidateTable(IWebElement table)
+        {
+            if (table.TagName.ToLower() != _tagName)
+                throw new Exception(string.Format("The {0} is not a table", table.TagName));
+        }
         private void ValidateRowIndex(int row)
         {
             if (row >= _dictTable.Count || row < 0)
                 throw new ArgumentOutOfRangeException();
         }
-
         private void ValidateColumn(string column)
         {
             bool hasHeader = false;
@@ -378,11 +323,105 @@ namespace SeleniumToolkit.TableElements
             if (!hasHeader)
                 throw new ArgumentException("The column name is not valid");
         }
-
         private void ValidateColumn(int column)
         {
             if (column >= Headers.Count || column < 0)
                 throw new ArgumentOutOfRangeException();
+        }
+
+        private void SetBodyFromWebTable(IWebElement table, CancellationToken? token, TableOptions options)
+        {
+            if (options.OnlyHeaders)
+                return;
+
+            ReadOnlyCollection<IWebElement> trs = table.FindElements(By.XPath(trExpression1.GetExpression()));
+            
+            if (trs.Count == 0)
+                trs = table.FindElements(By.XPath(trEXpression2.GetExpression()));
+
+            int startRow = options.StartRow > 0 ? options.StartRow : 0;
+            int rowAmount = options.RowAmount > 0 ? options.RowAmount : trs.Count;
+
+            //For each row in the table
+            foreach (IWebElement row in trs.Skip(startRow).ToList())
+            {
+                if (IsCancelationRequested(token))
+                {
+                    if (options.ClearRowsIfOperationCancel)
+                        Clear();
+
+                    break;
+                }
+
+                int headerIndex = 0;
+                
+                ReadOnlyCollection<IWebElement> cells = row.FindElements(By.XPath(tdOrTh));
+                if (cells.Count != Headers.Count)
+                    continue;
+
+                Dictionary<string, Cell> currentRow = new Dictionary<string, Cell>();
+                foreach (IWebElement cell in cells)
+                {
+                    if (IsCancelationRequested(token))
+                    {
+                        if (options.ClearRowsIfOperationCancel)
+                            Clear();
+
+                        break;
+                    }
+
+                    currentRow.Add(Headers[headerIndex].Text, GetTd(cell));
+                    headerIndex++;
+                }
+
+                OnRowCreated(currentRow);
+
+                _dictTable.Add(currentRow);
+                if (_dictTable.Count == rowAmount)
+                    break;
+            }
+        }
+        private void SetHeadersFromWebTable(IWebElement table, CancellationToken? token, TableOptions options)
+        {
+            string trXpression = new XpathExpression("tr", _anyWhereInChild).WherePosition(1).GetExpression();
+            IWebElement header = table.FindElement(By.XPath(trXpression));
+            ReadOnlyCollection<IWebElement> tds = header.FindElements(By.XPath(tdOrTh));
+
+            Headers = new List<Cell>();
+            for (int i = 0; i < tds.Count; i++)
+            {
+                if (IsCancelationRequested(token))
+                {
+                    if (options.ClearRowsIfOperationCancel)
+                        Clear();
+
+                    break;
+                }
+
+                Cell existHeader = Headers.FirstOrDefault(c => c.Text.Contains(tds[i].Text));
+                Cell cell = null;
+
+                if (existHeader != null)
+                    cell = GetTd(tds[i], isFromHeader: true, additionalText: i.ToString());
+                else
+                    cell = GetTd(tds[i], isFromHeader: true);
+
+                Headers.Add(cell);
+            }
+        }
+        private void SetParams()
+        {
+            _dictTable = new List<IDictionary<string, Cell>>();
+            trExpression1 = new XpathExpression("tr", _anyWhereInChild).WherePositionGreaterThan(1).WhereAncestor(new XpathExpression("table", _anyWhereInChild).WhereNotDescendant("thead"));
+            trEXpression2 = new XpathExpression("tr", _anyWhereInChild).WherePositionGreaterOrEqualThan(1).WhereNotParent("thead");
+            tdOrTh = new XpathExpression("th", _directChild).Union(new XpathExpression("td", _directChild));
+        }
+
+        private bool IsCancelationRequested(CancellationToken? token)
+        {
+            if (token.HasValue)
+                return token.Value.IsCancellationRequested;
+            return false;
         }
 
 

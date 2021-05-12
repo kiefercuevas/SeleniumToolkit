@@ -1,6 +1,7 @@
 ﻿using OpenQA.Selenium;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace SeleniumToolkit.TableElements
 {
@@ -9,8 +10,10 @@ namespace SeleniumToolkit.TableElements
         int Count { get; }
         IList<Cell> Headers { get; }
 
-        void AddTable(IWebElement table);
-        void AddTable(IWebElement table, int startRow, int amountOfRows);
+        event EventHandler<IReadOnlyDictionary<string, Cell>> RowCreated;
+
+        void AddTableBody(IWebElement table, CancellationToken? token);
+        void AddTableBody(IWebElement table, TableOptions options, CancellationToken? token);
         void Clear();
         void Dispose();
         Cell GetCell(int row, int column);
@@ -31,5 +34,7 @@ namespace SeleniumToolkit.TableElements
         IEnumerable<IDictionary<string, Cell>> GetRows(int rowNumber);
         IEnumerable<IDictionary<string, Cell>> GetRows(int start, int end);
         bool IsEmpty();
+        void Load(IWebElement table, CancellationToken? token = null);
+        void Load(IWebElement table, TableOptions options, CancellationToken? token = null);
     }
 }
