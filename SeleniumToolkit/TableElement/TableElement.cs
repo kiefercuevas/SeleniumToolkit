@@ -15,7 +15,6 @@ namespace SeleniumToolkit.TableElements
         private IList<IDictionary<string, Cell>> _dictTable;
         private int DefaultTextIndex = 1;
 
-        private IWebElement _currentTableElement;
         private XpathExpression trExpression1;
         private XpathExpression trEXpression2;
         private string tdOrTh;
@@ -28,35 +27,37 @@ namespace SeleniumToolkit.TableElements
         }
 
         /// <summary>
-        /// Loads all the information
+        /// Loads all the information from IWebElement table
         /// </summary>
-        public void Load()
+        public void Load(IWebElement table)
         {
+            ValidateTable(table);
             SetParams();
-            SetHeadersFromWebTable(_currentTableElement);
-            SetBodyFromWebTable(_currentTableElement, 0, -1);
+            SetHeadersFromWebTable(table);
+            SetBodyFromWebTable(table, 0, -1);
         }
 
         /// <summary>
-        /// Loads all the information
+        /// Loads all the information from IWebElement table
         /// </summary>
-        /// <param name="options">options to provide into the table</param>
-        public void Load(TableOptions options)
+        /// <param name="options">provide some options into the Table element</param>
+        public void Load(IWebElement table, TableOptions options)
         {
+            ValidateTable(table);
+
             if (options == null)
                 throw new ArgumentNullException(nameof(options));
 
             SetParams();
-            SetHeadersFromWebTable(_currentTableElement);
+            SetHeadersFromWebTable(table);
 
             if (options.GetEmptyTable == false)
-                SetBodyFromWebTable(_currentTableElement, options.StartRow, options.RowAmount);
+                SetBodyFromWebTable(table, options.StartRow, options.RowAmount);
         }
 
-        public TableElement(IWebElement table)
+        public TableElement()
         {
-            ValidateTable(table);
-            _currentTableElement = table;
+            
         }
 
         private void ValidateTable(IWebElement table)
