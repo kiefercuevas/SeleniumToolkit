@@ -2,6 +2,7 @@
 using SeleniumToolkit;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace SeleniumToolkit.TableElements
@@ -14,10 +15,11 @@ namespace SeleniumToolkit.TableElements
         private IList<IDictionary<string, Cell>> _dictTable;
         private int DefaultTextIndex = 1;
 
+        private IWebElement _currentTableElement;
         private XpathExpression trExpression1;
         private XpathExpression trEXpression2;
         private string tdOrTh;
-
+        
         public IList<Cell> Headers { get; private set; }
 
         public int Count
@@ -25,27 +27,36 @@ namespace SeleniumToolkit.TableElements
             get { return _dictTable.Count; }
         }
 
-
-        public TableElement(IWebElement table)
+        /// <summary>
+        /// Loads all the information
+        /// </summary>
+        public void Load()
         {
-            ValidateTable(table);
             SetParams();
-            SetHeadersFromWebTable(table);
-            SetBodyFromWebTable(table, 0, -1);
+            SetHeadersFromWebTable(_currentTableElement);
+            SetBodyFromWebTable(_currentTableElement, 0, -1);
         }
 
-        public TableElement(IWebElement table, TableOptions options)
+        /// <summary>
+        /// Loads all the information
+        /// </summary>
+        /// <param name="options">options to provide into the table</param>
+        public void Load(TableOptions options)
         {
-            ValidateTable(table);
-
             if (options == null)
                 throw new ArgumentNullException(nameof(options));
 
             SetParams();
-            SetHeadersFromWebTable(table);
+            SetHeadersFromWebTable(_currentTableElement);
 
             if (options.GetEmptyTable == false)
-                SetBodyFromWebTable(table, options.StartRow, options.RowAmount);
+                SetBodyFromWebTable(_currentTableElement, options.StartRow, options.RowAmount);
+        }
+
+        public TableElement(IWebElement table)
+        {
+            ValidateTable(table);
+            _currentTableElement = table;
         }
 
         private void ValidateTable(IWebElement table)
@@ -108,13 +119,15 @@ namespace SeleniumToolkit.TableElements
                 if (cells.Count != Headers.Count)
                     continue;
 
-                IDictionary<string, Cell> currentRow = new Dictionary<string, Cell>();
+                Dictionary<string, Cell> currentRow = new Dictionary<string, Cell>();
 
                 foreach (IWebElement cell in cells)
                 {
                     currentRow.Add(Headers[headerIndex].Text, GetTd(cell));
                     headerIndex++;
                 }
+
+                OnRowCreated(currentRow);
 
                 _dictTable.Add(currentRow);
                 if (_dictTable.Count == amountOfRows)
@@ -369,6 +382,13 @@ namespace SeleniumToolkit.TableElements
         {
             if (column >= Headers.Count || column < 0)
                 throw new ArgumentOutOfRangeException();
+        }
+
+
+        public event EventHandler<IReadOnlyDictionary<string, Cell>> RowCreated;
+        protected virtual void OnRowCreated(IReadOnlyDictionary<string, Cell> row)
+        {
+            RowCreated?.Invoke(this, row);
         }
     }
 }
