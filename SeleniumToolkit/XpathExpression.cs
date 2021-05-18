@@ -320,7 +320,7 @@ namespace SeleniumToolkit
         }
 
         /// <summary>
-        /// Creates an expression to look for the inner tag text to match with the expecified text value
+        /// Creates an expression for to look for the inner tag text that contains the expecified text value *only the direct text value*
         /// </summary>
         /// <param name="textValue">The text to use</param>
         /// <param name="caseSensitive">If false and attributeValue is not null then evaluate the attribute value as lowercase</param>
@@ -332,7 +332,19 @@ namespace SeleniumToolkit
         }
 
         /// <summary>
-        /// Creates an expression to look for the inner tag text that do not match with the expecified text value
+        /// Creates an expression to look for the inner tag text to match with the expecified text value
+        /// </summary>
+        /// <param name="textValue">The text to use</param>
+        /// <param name="caseSensitive">If false and attributeValue is not null then evaluate the attribute value as lowercase</param>
+        public XpathExpression WhereAllTextEqual(string textValue, bool caseSensitive = true)
+        {
+            ExecuteDefaultAttributeOperation();
+            ExecuteTextOperation("{0}={1}", ".", textValue, false, caseSensitive, isAttribute: false);
+            return this;
+        }
+
+        /// <summary>
+        /// Creates an expression for to look for the inner tag text that contains the expecified text value *only the direct text value*
         /// </summary>
         /// <param name="textValue">The text to use</param>
         /// <param name="caseSensitive">If false and attributeValue is not null then evaluate the attribute value as lowercase</param>
@@ -340,6 +352,18 @@ namespace SeleniumToolkit
         {
             ExecuteDefaultAttributeOperation();
             ExecuteTextOperation("not({0}={1})", "normalize-space(text()[1])", textValue, false, caseSensitive, isAttribute: false);
+            return this;
+        }
+
+        /// <summary>
+        /// Creates an expression to look for the inner tag text that do not match with the expecified text value
+        /// </summary>
+        /// <param name="textValue">The text to use</param>
+        /// <param name="caseSensitive">If false and attributeValue is not null then evaluate the attribute value as lowercase</param>
+        public XpathExpression WhereAllTextNotEqual(string textValue, bool caseSensitive = true)
+        {
+            ExecuteDefaultAttributeOperation();
+            ExecuteTextOperation("not({0}={1})", ".", textValue, false, caseSensitive, isAttribute: false);
             return this;
         }
 
