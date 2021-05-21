@@ -31,7 +31,7 @@ namespace SeleniumToolkit.DriverDownloaders
         {
             try
             {
-                string result = await Client.DownloadStringTaskAsync(GetUrl(browser));
+                string result = await Client.DownloadStringTaskAsync(GetVersionUrl(browser));
                 switch (browser)
                 {
                     case Browser.MOZILLA:
@@ -60,6 +60,7 @@ namespace SeleniumToolkit.DriverDownloaders
             try
             {
                 string fullPath = Path.Combine(directoryPath, GetDriverName(version, browser, system));
+                var t = GetDriverUrl(browser, system, version);
                 await Client.DownloadFileTaskAsync(GetDriverUrl(browser, system, version), fullPath);
 
                 string extension = Path.GetExtension(fullPath);
@@ -183,7 +184,7 @@ namespace SeleniumToolkit.DriverDownloaders
                 _ => throw new Exception("The browser is not valid"),
             };
         }
-        private static string GetUrl(Browser browser)
+        private static string GetVersionUrl(Browser browser)
         {
             return browser switch
             {

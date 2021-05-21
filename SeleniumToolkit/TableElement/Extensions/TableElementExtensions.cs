@@ -37,7 +37,7 @@ namespace SeleniumToolkit.TableElements.Extensions
         /// </summary>
         /// <param name="cellCallback">A callback to get the desired value for each cell in the table element</param>
         /// <returns>A datatable that represents the table element</returns>
-        public static DataTable CreateDataTable(this TableElement tableElement, Func<Cell, object> cellCallback)
+        public static DataTable CreateDataTable(this TableElement tableElement, Func<TableCell, object> cellCallback)
         {
             DataTable tb = new();
 

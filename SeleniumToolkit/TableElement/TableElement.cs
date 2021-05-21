@@ -13,14 +13,14 @@ namespace SeleniumToolkit.TableElements
         private readonly string _tagName = "table";
         private readonly string _anyWhereInChild = ".//";
         private readonly string _directChild = "./";
-        private IList<IDictionary<string, Cell>> _dictTable;
+        private IList<IDictionary<string, TableCell>> _dictTable;
         private int DefaultTextIndex = 1;
 
         private XpathExpression trExpression1;
         private XpathExpression trEXpression2;
         private string tdOrTh;
         
-        public IList<Cell> Headers { get; private set; }
+        public IList<TableCell> Headers { get; private set; }
 
         public int Count
         {
@@ -96,7 +96,7 @@ namespace SeleniumToolkit.TableElements
         /// Ge the column with the specified name
         /// </summary>
         /// <param name="column">Column name to look for</param>
-        public IEnumerable<Cell> GetColumn(string column)
+        public IEnumerable<TableCell> GetColumn(string column)
         {
             ValidateColumn(column);
             return _dictTable.Select(r => r[column]).ToList();
@@ -106,7 +106,7 @@ namespace SeleniumToolkit.TableElements
         /// Get the column with the specified column index
         /// </summary>
         /// <param name="column">Column index to look for</param>
-        public IEnumerable<Cell> GetColumn(int column)
+        public IEnumerable<TableCell> GetColumn(int column)
         {
             ValidateColumn(column);
             return _dictTable.Select(r => r[Headers[column].Text]).ToList();
@@ -116,7 +116,7 @@ namespace SeleniumToolkit.TableElements
         /// Get a row with the specified rowIndex
         /// </summary>
         /// <param name="rowIndex">The row Index to look for</param>
-        public IDictionary<string, Cell> GetRow(int rowIndex)
+        public IDictionary<string, TableCell> GetRow(int rowIndex)
         {
             ValidateRowIndex(rowIndex);
             return _dictTable[rowIndex];
@@ -126,7 +126,7 @@ namespace SeleniumToolkit.TableElements
         /// Get a row with the specified predicate
         /// </summary>
         /// <param name="rowIndex">The row predicate to use</param>
-        public IDictionary<string, Cell> GetRow(Func<IDictionary<string, Cell>, bool> predicate)
+        public IDictionary<string, TableCell> GetRow(Func<IDictionary<string, TableCell>, bool> predicate)
         {
             return _dictTable.FirstOrDefault(predicate);
         }
@@ -134,7 +134,7 @@ namespace SeleniumToolkit.TableElements
         /// Get the last row of the current table
         /// </summary>
         /// <returns>A dictionary that represent the last row</returns>
-        public IDictionary<string, Cell> GetLastRow()
+        public IDictionary<string, TableCell> GetLastRow()
         {
             return _dictTable[_dictTable.Count - 1];
         }
@@ -143,7 +143,7 @@ namespace SeleniumToolkit.TableElements
         /// Get the first row of the current table
         /// </summary>
         /// <returns>A dictionary that represent the first row</returns>
-        public IDictionary<string, Cell> GetFirstRow()
+        public IDictionary<string, TableCell> GetFirstRow()
         {
             return _dictTable.Count > 0 ? _dictTable[0] : null;
         }
@@ -152,7 +152,7 @@ namespace SeleniumToolkit.TableElements
         /// Return all rows that satisfy the criteria
         /// </summary>
         /// <param name="predicate">The criteria to look for</param>
-        public IEnumerable<IDictionary<string, Cell>> GetRows(Func<IDictionary<string, Cell>, bool> predicate)
+        public IEnumerable<IDictionary<string, TableCell>> GetRows(Func<IDictionary<string, TableCell>, bool> predicate)
         {
             return _dictTable.Where(predicate).ToList();
         }
@@ -162,7 +162,7 @@ namespace SeleniumToolkit.TableElements
         /// </summary>
         /// <param name="start">The start index to look for</param>
         /// <param name="end">The end index to look for</param>
-        public IEnumerable<IDictionary<string, Cell>> GetRows(int start, int end)
+        public IEnumerable<IDictionary<string, TableCell>> GetRows(int start, int end)
         {
             ValidateRowIndex(start);
             ValidateRowIndex(end);
@@ -172,7 +172,7 @@ namespace SeleniumToolkit.TableElements
         /// <summary>
         /// Return all rows
         /// </summary>
-        public IEnumerable<IDictionary<string, Cell>> GetRows()
+        public IEnumerable<IDictionary<string, TableCell>> GetRows()
         {
             return _dictTable.ToList();
         }
@@ -180,7 +180,7 @@ namespace SeleniumToolkit.TableElements
         /// <summary>
         /// Return the amount of rows specified
         /// </summary>
-        public IEnumerable<IDictionary<string, Cell>> GetRows(int rowNumber)
+        public IEnumerable<IDictionary<string, TableCell>> GetRows(int rowNumber)
         {
             ValidateRowIndex(rowNumber);
             return _dictTable.Take(rowNumber).ToList();
@@ -205,7 +205,7 @@ namespace SeleniumToolkit.TableElements
         /// <summary>
         /// Get all headers of the table as cell elements
         /// </summary>
-        public IEnumerable<Cell> GetHeaderCell()
+        public IEnumerable<TableCell> GetHeaderCell()
         {
             return Headers.ToList();
         }
@@ -217,7 +217,7 @@ namespace SeleniumToolkit.TableElements
         {
             IDictionary<string, IWebElement> dict = new Dictionary<string, IWebElement>();
             int index = 0;
-            foreach (Cell item in Headers)
+            foreach (TableCell item in Headers)
             {
                 if (dict.ContainsKey(item.Text))
                     dict.Add(item.Text + index.ToString(), item.Element);
@@ -246,7 +246,7 @@ namespace SeleniumToolkit.TableElements
         /// </summary>
         /// <param name="row">The row index to look for</param>
         /// <param name="column">The column index to look for</param>
-        public Cell GetCell(int row, int column)
+        public TableCell GetCell(int row, int column)
         {
             ValidateRowIndex(row);
             ValidateColumn(column);
@@ -258,7 +258,7 @@ namespace SeleniumToolkit.TableElements
         /// </summary>
         /// <param name="row">The row index to look for</param>
         /// <param name="column">The column name to look for</param>
-        public Cell GetCell(int row, string column)
+        public TableCell GetCell(int row, string column)
         {
             ValidateRowIndex(row);
             ValidateColumn(column);
@@ -288,14 +288,14 @@ namespace SeleniumToolkit.TableElements
             Clear();
         }
 
-        private Cell GetTd(IWebElement element, bool isFromHeader = false, string additionalText = "")
+        private TableCell GetTd(IWebElement element, bool isFromHeader = false, string additionalText = "")
         {
             if (string.IsNullOrWhiteSpace(element.Text) && isFromHeader)
             {
-                return new Cell(element, string.Format("DefaultHeader{0}", DefaultTextIndex++));
+                return new TableCell(element, string.Format("DefaultHeader{0}", DefaultTextIndex++));
             }
 
-            return new Cell(element, element.Text + additionalText);
+            return new TableCell(element, element.Text + additionalText);
         }
 
         private void ValidateTable(IWebElement table)
@@ -359,7 +359,7 @@ namespace SeleniumToolkit.TableElements
                 if (cells.Count != Headers.Count)
                     continue;
 
-                Dictionary<string, Cell> currentRow = new Dictionary<string, Cell>();
+                Dictionary<string, TableCell> currentRow = new Dictionary<string, TableCell>();
                 foreach (IWebElement cell in cells)
                 {
                     if (IsCancelationRequested(token))
@@ -387,7 +387,7 @@ namespace SeleniumToolkit.TableElements
             IWebElement header = table.FindElement(By.XPath(trXpression));
             ReadOnlyCollection<IWebElement> tds = header.FindElements(By.XPath(tdOrTh));
 
-            Headers = new List<Cell>();
+            Headers = new List<TableCell>();
             for (int i = 0; i < tds.Count; i++)
             {
                 if (IsCancelationRequested(token))
@@ -398,8 +398,8 @@ namespace SeleniumToolkit.TableElements
                     break;
                 }
 
-                Cell existHeader = Headers.FirstOrDefault(c => c.Text.Contains(tds[i].Text));
-                Cell cell = null;
+                TableCell existHeader = Headers.FirstOrDefault(c => c.Text.Contains(tds[i].Text));
+                TableCell cell = null;
 
                 if (existHeader != null)
                     cell = GetTd(tds[i], isFromHeader: true, additionalText: i.ToString());
@@ -411,7 +411,7 @@ namespace SeleniumToolkit.TableElements
         }
         private void SetParams()
         {
-            _dictTable = new List<IDictionary<string, Cell>>();
+            _dictTable = new List<IDictionary<string, TableCell>>();
             trExpression1 = new XpathExpression("tr", _anyWhereInChild).WherePositionGreaterThan(1).WhereAncestor(new XpathExpression("table", _anyWhereInChild).WhereNotDescendant("thead"));
             trEXpression2 = new XpathExpression("tr", _anyWhereInChild).WherePositionGreaterOrEqualThan(1).WhereNotParent("thead");
             tdOrTh = new XpathExpression("th", _directChild).Union(new XpathExpression("td", _directChild));
@@ -425,8 +425,8 @@ namespace SeleniumToolkit.TableElements
         }
 
 
-        public event EventHandler<IReadOnlyDictionary<string, Cell>> RowCreated;
-        protected virtual void OnRowCreated(IReadOnlyDictionary<string, Cell> row)
+        public event EventHandler<IReadOnlyDictionary<string, TableCell>> RowCreated;
+        protected virtual void OnRowCreated(IReadOnlyDictionary<string, TableCell> row)
         {
             RowCreated?.Invoke(this, row);
         }

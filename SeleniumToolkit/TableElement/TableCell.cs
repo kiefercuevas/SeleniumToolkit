@@ -5,7 +5,7 @@ namespace SeleniumToolkit.TableElements
     /// <summary>
     /// A class to represent a cell in TableElement class
     /// </summary>
-    public class Cell
+    public class TableCell
     {
         /// <summary>
         /// Web element of the cell
@@ -16,7 +16,7 @@ namespace SeleniumToolkit.TableElements
         /// </summary>
         public readonly string Text;
 
-        public Cell(IWebElement element, string text)
+        public TableCell(IWebElement element, string text)
         {
             Element = element;
             Text = text;
