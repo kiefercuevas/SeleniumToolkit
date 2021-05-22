@@ -15,13 +15,13 @@ namespace SeleniumToolkit.TableElements
         private readonly string _directChild = "./";
         private IList<IDictionary<string, TableCell>> _dictTable;
         private int DefaultTextIndex = 1;
+        private string DefaultHeaderName = "DefaultHeader";
 
         private XpathExpression trExpression1;
         private XpathExpression trEXpression2;
         private string tdOrTh;
-        
         public IList<TableCell> Headers { get; private set; }
-
+        
         public int Count
         {
             get { return _dictTable.Count; }
@@ -185,6 +185,57 @@ namespace SeleniumToolkit.TableElements
             ValidateRowIndex(rowNumber);
             return _dictTable.Take(rowNumber).ToList();
         }
+        
+        /// <summary>
+        /// Removes a row at a given index
+        /// </summary>
+        /// <param name="rowIndex">The index of the row to remove</param>
+        /// <returns>The row that was removed</returns>
+        public IDictionary<string, TableCell> RemoveRow(int rowIndex)
+        {
+            var item = _dictTable[rowIndex];
+            _dictTable.Remove(item);
+            return item;
+        }
+
+        /// <summary>
+        /// Removes the last row
+        /// </summary>
+        /// <returns>The row that was removed</returns>
+        public IDictionary<string, TableCell> RemoveLastRow()
+        {
+            var item = _dictTable[Count - 1];
+            _dictTable.Remove(item);
+            return item;
+        }
+
+        /// <summary>
+        /// Removes the first row
+        /// </summary>
+        /// <returns>The row that was removed</returns>
+        public IDictionary<string, TableCell> RemoveFirstRow()
+        {
+            var item = _dictTable[Count - 1];
+            _dictTable.Remove(item);
+            return item;
+        }
+        
+        /// <summary>
+        /// Remove all columns that has the DefaultHeader Text
+        /// </summary>
+        public void RemoveDefaultColumns()
+        {
+            var headersToRemove = Headers.Where(h => h.Text.Contains(DefaultHeaderName)).ToList();
+            var rows = GetRows();
+
+            foreach (var header in headersToRemove)
+            {
+                Headers.Remove(header);
+                foreach (IDictionary<string,TableCell> row in rows)
+                    row.Remove(header.Text);
+            }
+                
+        }
 
         /// <summary>
         /// Get all headers of the table
@@ -291,9 +342,7 @@ namespace SeleniumToolkit.TableElements
         private TableCell GetTd(IWebElement element, bool isFromHeader = false, string additionalText = "")
         {
             if (string.IsNullOrWhiteSpace(element.Text) && isFromHeader)
-            {
-                return new TableCell(element, string.Format("DefaultHeader{0}", DefaultTextIndex++));
-            }
+                return new TableCell(element, $"{DefaultHeaderName}{DefaultTextIndex++}");
 
             return new TableCell(element, element.Text + additionalText);
         }
@@ -335,7 +384,6 @@ namespace SeleniumToolkit.TableElements
                 return;
 
             ReadOnlyCollection<IWebElement> trs = table.FindElements(By.XPath(trExpression1.GetExpression()));
-            
             if (trs.Count == 0)
                 trs = table.FindElements(By.XPath(trEXpression2.GetExpression()));
 
@@ -353,12 +401,11 @@ namespace SeleniumToolkit.TableElements
                     break;
                 }
 
-                int headerIndex = 0;
-                
                 ReadOnlyCollection<IWebElement> cells = row.FindElements(By.XPath(tdOrTh));
                 if (cells.Count != Headers.Count)
                     continue;
 
+                int headerIndex = 0;
                 Dictionary<string, TableCell> currentRow = new Dictionary<string, TableCell>();
                 foreach (IWebElement cell in cells)
                 {
@@ -386,8 +433,10 @@ namespace SeleniumToolkit.TableElements
             string trXpression = new XpathExpression("tr", _anyWhereInChild).WherePosition(1).GetExpression();
             IWebElement header = table.FindElement(By.XPath(trXpression));
             ReadOnlyCollection<IWebElement> tds = header.FindElements(By.XPath(tdOrTh));
-
+            
+            HashSet<string> tempHeaders = new HashSet<string>();
             Headers = new List<TableCell>();
+
             for (int i = 0; i < tds.Count; i++)
             {
                 if (IsCancelationRequested(token))
@@ -398,14 +447,11 @@ namespace SeleniumToolkit.TableElements
                     break;
                 }
 
-                TableCell existHeader = Headers.FirstOrDefault(c => c.Text.Contains(tds[i].Text));
-                TableCell cell = null;
+                TableCell cell = GetTd(tds[i], 
+                                    isFromHeader: true, 
+                                    additionalText: tempHeaders.Contains(tds[i].Text) ? i.ToString() : "");
 
-                if (existHeader != null)
-                    cell = GetTd(tds[i], isFromHeader: true, additionalText: i.ToString());
-                else
-                    cell = GetTd(tds[i], isFromHeader: true);
-
+                tempHeaders.Add(cell.Text);
                 Headers.Add(cell);
             }
         }
@@ -430,5 +476,6 @@ namespace SeleniumToolkit.TableElements
         {
             RowCreated?.Invoke(this, row);
         }
+
     }
 }

@@ -29,6 +29,10 @@ namespace SeleniumToolkit.TableElements
         IDictionary<string, TableCell> GetLastRow();
         IDictionary<string, TableCell> GetRow(Func<IDictionary<string, TableCell>, bool> predicate);
         IDictionary<string, TableCell> GetRow(int rowIndex);
+        IDictionary<string, TableCell> RemoveRow(int rowIndex);
+        IDictionary<string, TableCell> RemoveLastRow();
+        IDictionary<string, TableCell> RemoveFirstRow();
+        void RemoveDefaultColumns();
         IEnumerable<IDictionary<string, TableCell>> GetRows();
         IEnumerable<IDictionary<string, TableCell>> GetRows(Func<IDictionary<string, TableCell>, bool> predicate);
         IEnumerable<IDictionary<string, TableCell>> GetRows(int rowNumber);
