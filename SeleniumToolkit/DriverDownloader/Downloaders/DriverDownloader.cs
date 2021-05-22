@@ -56,7 +56,7 @@ namespace SeleniumToolkit.DriverDownloader.Downloaders
 
         public abstract Task<string> DownLoad(string version, string directoryPath, SystemType system);
         public abstract Task<string> GetLastestVersion();
-
+        public abstract Task<string> GetStableVersion();
         public abstract void Dispose();
 
         public DriverDownloader(string partialName)

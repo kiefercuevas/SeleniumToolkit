@@ -30,6 +30,11 @@ namespace SeleniumToolkit.DriverDownloader.Downloaders
             }
         }
 
+        public override async Task<string> GetStableVersion()
+        {
+            return await GetLastestVersion();
+        }
+
         public override async Task<string> DownLoad(string version, string directoryPath, SystemType system)
         {
 

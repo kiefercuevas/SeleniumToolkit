@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace SeleniumToolkit.DriverDownloader.Downloaders
@@ -18,6 +19,18 @@ namespace SeleniumToolkit.DriverDownloader.Downloaders
         }
 
         public override async Task<string> GetLastestVersion()
+        {
+            try
+            {
+                return Sanatize(GetEdgeVersion(await Client.DownloadStringTaskAsync("https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/")));
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public override async Task<string> GetStableVersion()
         {
             try
             {
@@ -65,6 +78,18 @@ namespace SeleniumToolkit.DriverDownloader.Downloaders
         {
             Client.Dispose();
         }
-        
+
+        private string GetEdgeVersion(string html)
+        {
+            Regex stringHtml = new Regex(@"Version: *(\d+\.{1})+\d+");
+            var matches = stringHtml.Matches(html)
+                .OrderByDescending(m => m.Value)
+                .Select(m => m.Value)
+                .ToList();
+
+            if (matches.Count == 0)
+                throw new Exception("Could not found the driver version");
+            return matches.First().Replace("Version: ","");
+        }
     }
 }

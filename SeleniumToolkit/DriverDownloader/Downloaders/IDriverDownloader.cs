@@ -22,9 +22,14 @@ namespace SeleniumToolkit.DriverDownloader.Downloaders
         /// <returns>The path of the driver file</returns>
         Task<string> DownLoad(string version, string directoryPath, SystemType system);
         /// <summary>
-        /// Get the latest stable version of the driver
+        /// Get the latest version of the driver
         /// </summary>
-        /// <returns>A string that represents the latest stable version of the driver</returns>
+        /// <returns>A string that represents the latest version of the driver</returns>
         Task<string> GetLastestVersion();
+        /// <summary>
+        /// Get the stable version of the driver
+        /// </summary>
+        /// <returns>A string that represents the stable version of the driver</returns>
+        Task<string> GetStableVersion();
     }
 }

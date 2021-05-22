@@ -10,15 +10,15 @@ namespace SeleniumToolkit.DriverDownloader.Downloaders
     {
         /// <summary>File type valid for Edge browser</summary>
         ARM64,
-        /// <summary>File type valid for Edge, Mozilla and Chrome browser</summary>
+        /// <summary>File type valid for Edge, Mozilla, Chrome and Opera browser</summary>
         WIN32,
-        /// <summary>File type valid for Edge, Mozilla browser</summary>
+        /// <summary>File type valid for Edge, Mozilla and Opera browser</summary>
         WIN64,
         /// <summary>File type valid for Mozilla browser</summary>
         LINUX32_TAR_GZ,
         /// <summary>File type valid for Mozilla browser</summary>
         LINUX32_TAR_GZ_ASC,
-        /// <summary>File type valid for Chrome and Mozilla browser</summary>
+        /// <summary>File type valid for Chrome, Mozilla and Opera browser</summary>
         LINUX64,
         /// <summary>File type valid for Mozilla browser</summary>
         LINUX64_TAR_GZ,

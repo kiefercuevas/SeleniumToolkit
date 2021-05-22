@@ -60,7 +60,6 @@ namespace SeleniumToolkit.DriverDownloaders
             try
             {
                 string fullPath = Path.Combine(directoryPath, GetDriverName(version, browser, system));
-                var t = GetDriverUrl(browser, system, version);
                 await Client.DownloadFileTaskAsync(GetDriverUrl(browser, system, version), fullPath);
 
                 string extension = Path.GetExtension(fullPath);
@@ -135,7 +134,6 @@ namespace SeleniumToolkit.DriverDownloaders
         {
             return browser switch
             {
-                //https://github.com/mozilla/geckodriver/releases/download/v0.28.0/geckodriver-v0.28.0-win64.zip
                 Browser.CHROME => $"chromedriver_{GetDriverTypeName(system)}",
                 Browser.EDGE => $"edgedriver_{GetDriverTypeName(system)}",
                 Browser.MOZILLA => $"geckodriver-{version}-{GetDriverTypeName(system)}",

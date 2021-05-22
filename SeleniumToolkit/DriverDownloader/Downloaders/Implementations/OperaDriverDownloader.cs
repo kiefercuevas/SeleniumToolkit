@@ -4,16 +4,16 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace SeleniumToolkit.DriverDownloader.Downloaders
 {
-    public sealed class ChromeDriverDownloader : DriverDownloader
+    public class OperaDriverDownloader :DriverDownloader
     {
         private readonly WebClient Client;
-
-        public ChromeDriverDownloader() 
-            :base("chromedriver")
+        public OperaDriverDownloader()
+            : base("operadriver")
         {
             Client = new WebClient();
         }
@@ -22,7 +22,7 @@ namespace SeleniumToolkit.DriverDownloader.Downloaders
         {
             try
             {
-                return Sanatize(await Client.DownloadStringTaskAsync("https://chromedriver.storage.googleapis.com/LATEST_RELEASE"));
+                return Sanatize(GetOperaVersion(await Client.DownloadStringTaskAsync("https://github.com/operasoftware/operachromiumdriver/releases/latest")));
             }
             catch (Exception)
             {
@@ -30,19 +30,22 @@ namespace SeleniumToolkit.DriverDownloader.Downloaders
             }
         }
 
+        public override async Task<string> GetStableVersion()
+        {
+            return await GetLastestVersion();
+        }
+
         public override async Task<string> DownLoad(string version, string directoryPath, SystemType system)
         {
-
             try
             {
                 ValidateSystemType(system);
 
                 string fullName = $"{PartialName}_{GetDriverTypeName(system)}";
-                string url = $"https://chromedriver.storage.googleapis.com/{version}/{fullName}";
+                string url = $"https://github.com/operasoftware/operachromiumdriver/releases/download/{version}/{fullName}";
                 string fullPath = Path.Combine(directoryPath, fullName);
 
                 await Client.DownloadFileTaskAsync(url, fullPath);
-
                 return fullPath;
             }
             catch (Exception)
@@ -53,11 +56,11 @@ namespace SeleniumToolkit.DriverDownloader.Downloaders
 
         public override SystemType[] GetSystemTypes()
         {
-            return new SystemType[] 
+            return new SystemType[]
             {
                SystemType.WIN32,
+               SystemType.WIN64,
                SystemType.MAC64,
-               SystemType.MAC64_M1,
                SystemType.LINUX64
             };
         }
@@ -65,6 +68,14 @@ namespace SeleniumToolkit.DriverDownloader.Downloaders
         public override void Dispose()
         {
             Client.Dispose();
+        }
+
+        private string GetOperaVersion(string html)
+        {
+            Regex stringHtml = new Regex(@"https://github.com/operasoftware/operachromiumdriver/releases/tag/(v|V){1}.?(\d+.?)+");
+            Match match = stringHtml.Match(html);
+
+            return string.IsNullOrWhiteSpace(match.Value) ? string.Empty : Path.GetFileName(match.Value);
         }
     }
 }
