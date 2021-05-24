@@ -3,9 +3,9 @@
 namespace SeleniumToolkit.TableElements
 {
     /// <summary>
-    /// A struct to represent a cell in TableElement class
+    /// A class to represent a cell in TableElement class
     /// </summary>
-    public struct TableCell
+    public class TableCell
     {
         /// <summary>
         /// Web element of the cell
