@@ -129,7 +129,7 @@ namespace SeleniumToolkit.TableElements
         }
         public IDictionary<string, TableCell> RemoveFirstRow()
         {
-            var item = _dictTable[Count - 1];
+            var item = _dictTable[0];
             _dictTable.Remove(item);
             return item;
         }
