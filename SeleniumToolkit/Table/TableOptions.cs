@@ -1,4 +1,4 @@
-﻿namespace SeleniumToolkit.TableElements
+﻿namespace SeleniumToolkit.Table
 {
     /// <summary>
     /// Provide some options to create the table

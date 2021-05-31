@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 
-namespace SeleniumToolkit.TableElements
+namespace SeleniumToolkit.Table
 {
     public interface ITableElement
     {

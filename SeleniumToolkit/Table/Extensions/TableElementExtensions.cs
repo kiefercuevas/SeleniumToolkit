@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SeleniumToolkit.TableElements.Extensions
+namespace SeleniumToolkit.Table.Extensions
 {
     public static class TableElementExtensions
     {

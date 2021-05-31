@@ -1,6 +1,6 @@
 ﻿using OpenQA.Selenium;
 
-namespace SeleniumToolkit.TableElements
+namespace SeleniumToolkit.Table
 {
     /// <summary>
     /// A class to represent a cell in TableElement class
