@@ -31,5 +31,11 @@ namespace SeleniumToolkit.DriverDownloader.Downloaders
         /// </summary>
         /// <returns>A string that represents the stable version of the driver</returns>
         Task<string> GetStableVersion();
+
+        /// <summary>
+        /// Get all available versions
+        /// </summary>
+        /// <returns>An array with all the available versions</returns>
+        Task<string[]> GetVersions();
     }
 }

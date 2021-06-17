@@ -23,7 +23,21 @@ namespace SeleniumToolkit.DriverDownloader.Downloaders
         {
             try
             {
-                return Sanatize(GetChromeVersion(await Client.DownloadStringTaskAsync("https://chromedriver.chromium.org/downloads")));
+                string lastVersion = GetChromeVersion(await Client.DownloadStringTaskAsync("https://chromedriver.chromium.org/downloads"))[0];
+                return Sanatize(lastVersion);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public override async Task<string[]> GetVersions()
+        {
+            try
+            {
+                return GetChromeVersion(await Client.DownloadStringTaskAsync("https://chromedriver.chromium.org/downloads"))
+                        .Select(m => Sanatize(m)).ToArray();
             }
             catch (Exception)
             {
@@ -75,7 +89,7 @@ namespace SeleniumToolkit.DriverDownloader.Downloaders
             };
         }
 
-        private string GetChromeVersion(string html)
+        private string [] GetChromeVersion(string html)
         {
             Regex stringHtml = new Regex(@"ChromeDriver *(\d+\.{1})+\d+");
             var matches = stringHtml.Matches(html)
@@ -85,12 +99,13 @@ namespace SeleniumToolkit.DriverDownloader.Downloaders
 
             if (matches.Count == 0)
                 throw new Exception("Could not found the driver version");
-            return matches.First().Replace("ChromeDriver ", "");
+            return matches.Select(m => m.Replace("ChromeDriver ", "")).ToArray();
         }
 
         public override void Dispose()
         {
             Client.Dispose();
         }
+
     }
 }

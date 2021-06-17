@@ -22,7 +22,22 @@ namespace SeleniumToolkit.DriverDownloader.Downloaders
         {
             try
             {
-                return Sanatize(GetEdgeVersion(await Client.DownloadStringTaskAsync("https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/")));
+                string latestVersion = GetEdgeVersion(await Client.DownloadStringTaskAsync("https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/"))[0];
+                return Sanatize(latestVersion);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public override async Task<string []> GetVersions()
+        {
+            try
+            {
+                return GetEdgeVersion(await Client.DownloadStringTaskAsync("https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/"))
+                    .Select(m => Sanatize(m))
+                    .ToArray();
             }
             catch (Exception)
             {
@@ -41,6 +56,8 @@ namespace SeleniumToolkit.DriverDownloader.Downloaders
                 throw;
             }
         }
+
+
 
         public override async Task<string> DownLoad(string version, string directoryPath, SystemType system)
         {
@@ -79,7 +96,7 @@ namespace SeleniumToolkit.DriverDownloader.Downloaders
             Client.Dispose();
         }
 
-        private string GetEdgeVersion(string html)
+        private string [] GetEdgeVersion(string html)
         {
             Regex stringHtml = new Regex(@"Version: *(\d+\.{1})+\d+");
             var matches = stringHtml.Matches(html)
@@ -89,7 +106,7 @@ namespace SeleniumToolkit.DriverDownloader.Downloaders
 
             if (matches.Count == 0)
                 throw new Exception("Could not found the driver version");
-            return matches.First().Replace("Version: ","");
+            return matches.Select(m => m.Replace("Version: ","")).ToArray();
         }
     }
 }

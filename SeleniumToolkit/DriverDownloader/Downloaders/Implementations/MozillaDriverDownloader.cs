@@ -30,6 +30,20 @@ namespace SeleniumToolkit.DriverDownloader.Downloaders
             }
         }
 
+        public override async Task<string[]> GetVersions()
+        {
+            try
+            {
+                return GetMozillaVersions(await Client.DownloadStringTaskAsync("https://github.com/mozilla/geckodriver/releases"))
+                     .Select(m => Sanatize(m))
+                     .ToArray();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
         public override async Task<string> GetStableVersion()
         {
             return await GetLastestVersion();
@@ -81,6 +95,16 @@ namespace SeleniumToolkit.DriverDownloader.Downloaders
             Match match = stringHtml.Match(html);
 
             return string.IsNullOrWhiteSpace(match.Value) ? string.Empty : Path.GetFileName(match.Value);
+        }
+
+        private string[] GetMozillaVersions(string html)
+        {
+            Regex stringHtml = new Regex(@"/mozilla/geckodriver/releases/tag/(v|V){1}.?(\d+\.{1})+\d+");
+            MatchCollection matches = stringHtml.Matches(html);
+
+            return matches.Where(m => string.IsNullOrWhiteSpace(m.Value) == false)
+                .Select(m => Path.GetFileName(m.Value))
+                .ToArray();
         }
 
     }

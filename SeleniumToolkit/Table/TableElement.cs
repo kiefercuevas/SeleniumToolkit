@@ -48,12 +48,12 @@ namespace SeleniumToolkit.Table
         public IEnumerable<TableCell> GetColumn(string column)
         {
             ValidateColumn(column);
-            return _dictTable.Select(r => r[column]).ToList();
+            return _dictTable.Select(r => r[column]);
         }
         public IEnumerable<TableCell> GetColumn(int column)
         {
             ValidateColumn(column);
-            return _dictTable.Select(r => r[Headers[column].Text]).ToList();
+            return _dictTable.Select(r => r[Headers[column].Text]);
         }
 
         public IDictionary<string, IWebElement> GetHeadersDict()
@@ -74,7 +74,7 @@ namespace SeleniumToolkit.Table
         }
         public IEnumerable<string> GetHeadersString()
         {
-            return Headers.Select(h => h.Text).ToList();
+            return Headers.Select(h => h.Text);
         }
 
         public IDictionary<string, TableCell> GetRow(int rowIndex)
@@ -97,22 +97,22 @@ namespace SeleniumToolkit.Table
 
         public IEnumerable<IDictionary<string, TableCell>> GetRows()
         {
-            return _dictTable.ToList();
+            return _dictTable.AsEnumerable();
         }
         public IEnumerable<IDictionary<string, TableCell>> GetRows(int rowNumber)
         {
             ValidateRowIndex(rowNumber);
-            return _dictTable.Take(rowNumber).ToList();
+            return _dictTable.Take(rowNumber);
         }
         public IEnumerable<IDictionary<string, TableCell>> GetRows(int start, int end)
         {
             ValidateRowIndex(start);
             ValidateRowIndex(end);
-            return _dictTable.Skip(start).Take(end).ToList();
+            return _dictTable.Skip(start).Take(end);
         }
         public IEnumerable<IDictionary<string, TableCell>> GetRows(Func<IDictionary<string, TableCell>, bool> predicate)
         {
-            return _dictTable.Where(predicate).ToList();
+            return _dictTable.Where(predicate);
         }
 
         public void AddRow(IDictionary<string, TableCell> row)
