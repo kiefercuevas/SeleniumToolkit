@@ -255,7 +255,7 @@ namespace SeleniumToolkit.Table
             int rowAmount = options.RowAmount > 0 ? options.RowAmount : trs.Count;
 
             //For each row in the table
-            foreach (IWebElement row in trs.Skip(startRow).ToList())
+            foreach (IWebElement row in trs.Skip(startRow))
             {
                 if (IsCancelationRequested(token))
                 {
