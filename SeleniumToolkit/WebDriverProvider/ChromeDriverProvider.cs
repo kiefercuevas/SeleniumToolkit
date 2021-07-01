@@ -39,7 +39,7 @@ namespace SeleniumToolkit.WebDriverProviders
             Open();
         }
 
-        public virtual async Task ResetAsyncDriver()
+        public virtual async Task ResetDriverAsync()
         {
             ResetDriver();
         }

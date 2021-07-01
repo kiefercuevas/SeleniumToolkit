@@ -11,7 +11,7 @@ namespace SeleniumToolkit.WebDriverProviders
         void CloseDriver();
         void ResetDriver();
         Task OpenAsync();
-        Task ResetAsyncDriver();
+        Task ResetDriverAsync();
         IWebDriver GetDriverInstance();
 
     }
