@@ -29,6 +29,21 @@ namespace SeleniumToolkit.DriverDownloader.Downloaders.Extensions
         /// <summary>
         /// Execute all the process from downloading the driver to UnZip all the files related to it
         /// </summary>
+        /// /// <param name="version">The current version to download</param>
+        /// <param name="directoryPath">The directory to download the file</param>
+        /// <param name="system"></param>
+        /// <returns>Return the file Path of the current driver instance</returns>
+        public static async Task<string> DownloadAndUnzip(this IDriverDownloader driverDownloader,
+            string version, string directoryPath, SystemType system)
+        {
+            string filePath = await driverDownloader.DownLoad(version, directoryPath, system);
+            driverDownloader.UnZipDriverFile(filePath);
+            return filePath;
+        }
+
+        /// <summary>
+        /// Execute all the process from downloading the driver to UnZip all the files related to it
+        /// </summary>
         /// <param name="directoryPath">The directory to download the file</param>
         /// <param name="system"></param>
         /// <param name="driverFileCallback">
