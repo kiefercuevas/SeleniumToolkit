@@ -1,6 +1,7 @@
 ﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using System;
+using System.Threading.Tasks;
 
 namespace SeleniumToolkit.WebDriverProviders
 {
@@ -31,6 +32,16 @@ namespace SeleniumToolkit.WebDriverProviders
         public void Open()
         {
             Driver = GetDriverInstance();
+        }
+
+        public virtual async Task OpenAsync()
+        {
+            Open();
+        }
+
+        public virtual async Task ResetAsyncDriver()
+        {
+            ResetDriver();
         }
 
         public IWebDriver GetDriverInstance()

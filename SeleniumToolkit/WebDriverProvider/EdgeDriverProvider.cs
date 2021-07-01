@@ -37,6 +37,16 @@ namespace SeleniumToolkit.WebDriverProviders
             Driver = GetDriverInstance();
         }
 
+        public virtual async Task OpenAsync()
+        {
+            Open();
+        }
+
+        public virtual async Task ResetAsyncDriver()
+        {
+            ResetDriver();
+        }
+
         public IWebDriver GetDriverInstance()
         {
             string path = Environment.CurrentDirectory;

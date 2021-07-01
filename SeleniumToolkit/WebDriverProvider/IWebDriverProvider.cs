@@ -1,4 +1,5 @@
 ﻿using OpenQA.Selenium;
+using System.Threading.Tasks;
 
 namespace SeleniumToolkit.WebDriverProviders
 {
@@ -9,6 +10,8 @@ namespace SeleniumToolkit.WebDriverProviders
         void Open();
         void CloseDriver();
         void ResetDriver();
+        Task OpenAsync();
+        Task ResetAsyncDriver();
         IWebDriver GetDriverInstance();
 
     }
