@@ -137,6 +137,15 @@ namespace SeleniumToolkit.Table
         void Clear();
         void Dispose();
 
+        /// <summary>Refresh the table with the current IWebElement table</summary>
+        /// <param name="token">A cancelation token to cancel the operation</param>
+        void Refresh(CancellationToken? token = null);
+
+        /// <summary>Refresh the table with the current IWebElement table</summary>
+        /// <param name="options">provide some options into the Table element</param>
+        /// <param name="token">A cancelation token to cancel the operation</param>
+        void Refresh(TableOptions options, CancellationToken? token = null);
+
         event EventHandler<IReadOnlyDictionary<string, TableCell>> RowCreated;
     }
 }

@@ -168,6 +168,8 @@ namespace SeleniumToolkit.Table
         public void Load(CancellationToken? token = null)
         {
             TableOptions options = new TableOptions();
+
+            SetParams();
             SetHeadersFromWebTable(_tableElement, token, options);
             SetBodyFromWebTable(_tableElement, token, options);
         }
@@ -189,6 +191,24 @@ namespace SeleniumToolkit.Table
         public void Dispose()
         {
             Clear();
+        }
+
+        public void Refresh(CancellationToken? token = null)
+        {
+            TableOptions options = new TableOptions();
+
+            Clear();
+            SetHeadersFromWebTable(_tableElement, token, options);
+            SetBodyFromWebTable(_tableElement, token, options);
+        }
+        public void Refresh(TableOptions options, CancellationToken? token = null)
+        {
+            if (options == null)
+                throw new ArgumentNullException(nameof(options));
+
+            Clear();
+            SetHeadersFromWebTable(_tableElement, token, options);
+            SetBodyFromWebTable(_tableElement, token, options);
         }
 
         private TableCell GetTd(IWebElement element, bool isFromHeader = false, string additionalText = "")
